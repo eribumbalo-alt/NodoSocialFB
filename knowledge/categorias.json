@@ -1,0 +1,46 @@
+{
+    "Alumbrado público": {
+        "subcategorias": [
+            "Falta de mantenimiento",
+            "Luminaria apagada",
+            "Poste caído"
+        ],
+        "area": "Servicios Públicos"
+    },
+
+    "Calles y baches": {
+        "subcategorias": [
+            "Bache",
+            "Calzada rota",
+            "Hundimiento"
+        ],
+        "area": "Obras Públicas"
+    },
+
+    "Agua y cloacas": {
+        "subcategorias": [
+            "Pérdida de agua",
+            "Caño roto",
+            "Cloaca tapada"
+        ],
+        "area": "Aysam"
+    },
+
+    "Residuos": {
+        "subcategorias": [
+            "Recolección",
+            "Microbasural",
+            "Contenedor"
+        ],
+        "area": "Servicios Públicos"
+    },
+
+    "Seguridad": {
+        "subcategorias": [
+            "Robos",
+            "Vandalismo",
+            "Iluminación insegura"
+        ],
+        "area": "Seguridad Ciudadana"
+    }
+}

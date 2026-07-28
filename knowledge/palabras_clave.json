@@ -1,0 +1,25 @@
+{
+    "Basura": [
+        "basura",
+        "residuos",
+        "contenedor",
+        "recolector",
+        "camión"
+    ],
+
+    "Calles": [
+        "bache",
+        "pozo",
+        "calle",
+        "vereda",
+        "cordón"
+    ],
+
+    "Alumbrado": [
+        "luz",
+        "farola",
+        "poste",
+        "luminaria",
+        "oscuro"
+    ]
+}

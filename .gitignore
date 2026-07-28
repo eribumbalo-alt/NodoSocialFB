@@ -1,0 +1,58 @@
+# ============================================
+# CREDENCIALES - NUNCA SUBIR
+# ============================================
+config/*
+!config/grupos.txt
+.env
+credenciales_google.json
+credenciales.json
+credentials.json
+service_account.json
+token.json
+*.pem
+*.key
+
+# ============================================
+# SESION DE FACEBOOK (Playwright)
+# ============================================
+perfil_facebook_nodo/
+perfil_*/
+user_data/
+playwright_profile/
+browser_data/
+facebook_sesion.json
+
+# ============================================
+# DATOS DE VECINOS - NO PUBLICAR
+# ============================================
+data/
+logs/
+*.jsonl
+*.log
+knowledge/dataset_entrenamiento.jsonl
+knowledge/memoria_clasificador.json
+knowledge/ejemplos.json
+knowledge/metricas.json
+
+# ============================================
+# PRUEBAS (guarda los scripts, no los datos)
+# ============================================
+pruebas/*
+!pruebas/*.py
+
+# ============================================
+# PYTHON
+# ============================================
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# ============================================
+# SISTEMA
+# ============================================
+.vscode/
+Thumbs.db
+desktop.ini
