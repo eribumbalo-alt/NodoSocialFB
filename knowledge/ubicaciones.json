@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "municipio": "Maipú, Mendoza",
+
+  "nota": "Lista cerrada de lugares. El clasificador solo puede devolver una ubicacion que este aca; si no reconoce ninguna, deja el campo vacio. Asi se corta la invencion de ubicaciones.",
+
+  "distritos": [
+    "Ciudad de Maipú",
+    "Luzuriaga",
+    "Gutiérrez",
+    "Coquimbito",
+    "Rodeo del Medio",
+    "Fray Luis Beltrán",
+    "Russell",
+    "Cruz de Piedra",
+    "Barrancas",
+    "San Roque",
+    "General Ortega",
+    "Lunlunta"
+  ],
+
+  "barrios": [
+    "Barrio Don Bosco",
+    "Barrio Agua y Energía",
+    "Barrio Agua y Energía 23",
+    "Barrio Rincón de Mitre",
+    "Barrio Antártida Argentina",
+    "Barrio Canciller",
+    "Barrio Canciller II",
+    "Barrio Jardín",
+    "Barrio 25 de Mayo",
+    "Barrio 26 de Julio",
+    "Barrio 9 de Julio",
+    "Barrio Jesús de Nazaret",
+    "Barrio Provincias Unidas",
+    "Barrio FOECYT",
+    "Barrio UPCN",
+    "Barrio Bancario",
+    "Barrio Municipal",
+    "Barrio Ferroviario",
+    "Barrio Covimet",
+    "Barrio AMUPPOL",
+    "Barrio San Eduardo",
+    "Barrio Santa Ana",
+    "Barrio El Torreón",
+    "Barrio Los Álamos",
+    "Barrio Las Viñas",
+    "Barrio Los Olivos",
+    "Barrio Nuevo Horizonte",
+    "Barrio Renacer",
+    "Barrio Sol y Sierra",
+    "Barrio Cooperativa Fray Luis Beltrán",
+    "Barrio Cooperativa Luzuriaga",
+    "Barrio El Rosedal",
+    "Barrio El Pedregal",
+    "Barrio Los Andes"
+  ],
+
+  "variantes": {
+    "maipu": "Ciudad de Maipú",
+    "maipú": "Ciudad de Maipú",
+    "beltran": "Fray Luis Beltrán",
+    "beltrán": "Fray Luis Beltrán",
+    "fray luis": "Fray Luis Beltrán",
+    "rodeo": "Rodeo del Medio",
+    "gutierrez": "Gutiérrez",
+    "don bosco": "Barrio Don Bosco",
+    "rincon de mitre": "Barrio Rincón de Mitre",
+    "agua y energia": "Barrio Agua y Energía",
+    "agua y energia 23": "Barrio Agua y Energía 23",
+    "el torreon": "Barrio El Torreón",
+    "los alamos": "Barrio Los Álamos"
+  },
+
+  "regla_para_el_modelo": "Si el texto menciona un distrito o barrio de esta lista, poner ese nombre en el campo ubicacion. Si ademas menciona una calle y altura, agregarlas. Si no aparece ninguno de estos lugares, dejar el campo vacio. Nunca inventar ni deducir una ubicacion."
+}

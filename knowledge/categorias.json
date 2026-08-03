@@ -1,46 +1,520 @@
 {
+  "version": "2.0",
+  "municipio": "Maipú, Mendoza",
+  "actualizado": "2026-08-03",
+
+  "nota": "El campo no_incluye es el mas importante: no basta con decir que NO es una categoria, hay que decir a donde va. Un modelo necesita el destino, no solo la prohibicion.",
+
+  "categorias": {
+
     "Alumbrado público": {
-        "subcategorias": [
-            "Falta de mantenimiento",
-            "Luminaria apagada",
-            "Poste caído"
-        ],
-        "area": "Servicios Públicos"
+      "definicion": "Falta, falla o intermitencia de luminarias en el espacio publico. Competencia municipal directa.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Servicios Públicos",
+      "subcategorias": [
+        "luminaria_apagada",
+        "luminaria_intermitente",
+        "poste_dañado",
+        "cuadra_sin_alumbrado",
+        "plaza_sin_iluminacion",
+        "pedido_de_nuevas_luminarias"
+      ],
+      "incluye": [
+        "luminaria quemada o apagada",
+        "cuadra, plaza o pasillo a oscuras",
+        "poste de alumbrado caido o inclinado",
+        "pedido de mas iluminacion por inseguridad"
+      ],
+      "no_incluye": [
+        "corte de luz en las casas (es EDEMSA) -> Otra jurisdicción",
+        "semaforo apagado o descompuesto -> Tránsito y señalización",
+        "luz de un comercio o vivienda particular -> No corresponde"
+      ],
+      "terminos": ["luminaria", "farola", "alumbrado", "a oscuras", "sin luz en la calle", "foco quemado"]
     },
 
-    "Calles y baches": {
-        "subcategorias": [
-            "Bache",
-            "Calzada rota",
-            "Hundimiento"
-        ],
-        "area": "Obras Públicas"
+    "Higiene urbana": {
+      "definicion": "Basura, escombros, ramas y residuos en la via publica. Incluye fallas en la recoleccion domiciliaria.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Higiene Urbana",
+      "subcategorias": [
+        "microbasural",
+        "basural_grande",
+        "recoleccion_no_paso",
+        "escombros_en_vereda",
+        "ramas_sin_retirar",
+        "contenedor_roto_o_desbordado",
+        "animal_muerto_en_via_publica"
+      ],
+      "incluye": [
+        "basura acumulada en terreno baldio o esquina",
+        "el camion recolector no paso",
+        "escombros o restos de obra en la vereda",
+        "ramas de poda que nadie retira",
+        "olor nauseabundo por residuos"
+      ],
+      "no_incluye": [
+        "acequia tapada con basura -> Acequias",
+        "basura dentro de una propiedad privada -> Conflicto vecinal",
+        "convocatoria vecinal a limpiar por cuenta propia -> No corresponde"
+      ],
+      "terminos": ["basura", "basural", "microbasural", "residuos", "escombros", "el camion no paso", "recoleccion"]
+    },
+
+    "Acequias": {
+      "definicion": "Limpieza y estado de las acequias. En Maipu el reclamo tipico es por acequia tapada o sucia.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Servicios Públicos",
+      "subcategorias": [
+        "acequia_tapada",
+        "acequia_sucia",
+        "acequia_rota",
+        "acequia_sin_puente_o_tapa",
+        "agua_estancada"
+      ],
+      "incluye": [
+        "acequia tapada con basura, tierra o ramas",
+        "acequia rota o hundida",
+        "agua estancada en la acequia, con mosquitos",
+        "falta de limpieza del cauce"
+      ],
+      "no_incluye": [
+        "derroche o mal uso del agua de riego -> Riego",
+        "agua servida o cloacal en la calle -> Agua y cloacas",
+        "basura en la vereda o en un baldio -> Higiene urbana"
+      ],
+      "terminos": ["acequia", "acequias tapadas", "cauce", "agua estancada", "zanja"]
+    },
+
+    "Riego": {
+      "definicion": "Uso, derroche o falta de agua de riego. El reclamo tipico es por derroche.",
+      "jurisdiccion": "mixta",
+      "area_sugerida": "Departamento General de Irrigación / Municipio",
+      "subcategorias": [
+        "derroche_de_agua",
+        "riego_fuera_de_turno",
+        "falta_de_turno_de_riego",
+        "canal_con_perdida",
+        "hidrante_o_llave_abierta"
+      ],
+      "incluye": [
+        "agua de riego corriendo sin uso o desbordada",
+        "vecino que riega fuera de turno",
+        "perdida de agua en un canal o compuerta",
+        "falta de agua para riego en la finca o el arbolado"
+      ],
+      "no_incluye": [
+        "acequia tapada o sucia -> Acequias",
+        "falta de agua potable en las casas -> Agua y cloacas",
+        "perdida de agua potable en la calle -> Agua y cloacas"
+      ],
+      "terminos": ["riego", "derroche de agua", "turno de riego", "compuerta", "canal", "regando"]
     },
 
     "Agua y cloacas": {
-        "subcategorias": [
-            "Pérdida de agua",
-            "Caño roto",
-            "Cloaca tapada"
-        ],
-        "area": "Aysam"
+      "definicion": "Prestacion del servicio de agua potable y cloacas.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Obras Sanitarias",
+      "subcategorias": [
+        "falta_de_agua",
+        "baja_presion",
+        "perdida_de_agua_en_la_calle",
+        "cloaca_desbordada",
+        "aguas_servidas_en_la_calle",
+        "olor_cloacal",
+        "tapa_de_camara_rota"
+      ],
+      "incluye": [
+        "sin agua o con muy baja presion",
+        "perdida de agua potable en la calzada",
+        "cloaca desbordada o tapada",
+        "aguas servidas corriendo por la calle",
+        "olor cloacal persistente"
+      ],
+      "no_incluye": [
+        "agua de riego -> Riego",
+        "acequia tapada -> Acequias",
+        "agua de lluvia acumulada -> Calles y baches"
+      ],
+      "terminos": ["sin agua", "presion de agua", "cloaca", "aguas servidas", "perdida de agua", "olor cloacal"]
     },
 
-    "Residuos": {
-        "subcategorias": [
-            "Recolección",
-            "Microbasural",
-            "Contenedor"
-        ],
-        "area": "Servicios Públicos"
+    "Calles y baches": {
+      "definicion": "Estado de la calzada, veredas y desagues.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Obras Municipales",
+      "subcategorias": [
+        "pozo_o_bache",
+        "calle_de_tierra_intransitable",
+        "falta_de_asfalto",
+        "vereda_rota",
+        "cordon_cuneta_roto",
+        "anegamiento",
+        "falta_de_lomo_de_burro"
+      ],
+      "incluye": [
+        "pozos y baches en la calzada",
+        "calle de tierra intransitable o con huellones",
+        "vereda rota o levantada",
+        "cordon cuneta destruido",
+        "calle que se inunda cuando llueve",
+        "pedido de reductores de velocidad"
+      ],
+      "no_incluye": [
+        "obra empezada y abandonada -> Obras públicas",
+        "falta de señalizacion o semaforo -> Tránsito y señalización",
+        "acequia rota -> Acequias"
+      ],
+      "terminos": ["pozo", "pozos", "bache", "baches", "calle rota", "asfalto", "vereda", "cordon cuneta", "lomo de burro"]
+    },
+
+    "Arbolado y poda": {
+      "definicion": "Arbolado publico, poda, malezas y espacios verdes sin mantener.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Ambiente y Arbolado",
+      "subcategorias": [
+        "arbol_caido_o_en_riesgo",
+        "poda_necesaria",
+        "raices_que_rompen_vereda",
+        "malezas_o_pastizal",
+        "falta_de_desmalezado",
+        "arbol_sobre_cables"
+      ],
+      "incluye": [
+        "arbol caido o con riesgo de caer",
+        "ramas que tapan luminarias o cables",
+        "raices que levantan la vereda",
+        "pastizal o malezas altas en terreno o banquina"
+      ],
+      "no_incluye": [
+        "ramas ya podadas que nadie retira -> Higiene urbana",
+        "plaza sin mantenimiento general -> Espacios públicos"
+      ],
+      "terminos": ["poda", "arbol", "arboles", "ramas", "malezas", "pastizal", "desmalezado"]
+    },
+
+    "Tránsito y señalización": {
+      "definicion": "Circulacion, señales, semaforos y conductas viales.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Tránsito",
+      "subcategorias": [
+        "semaforo_descompuesto",
+        "falta_de_señalizacion",
+        "exceso_de_velocidad",
+        "picadas",
+        "escapes_libres",
+        "estacionamiento_indebido",
+        "cruce_peligroso"
+      ],
+      "incluye": [
+        "semaforo apagado, intermitente o mal sincronizado",
+        "falta de señales, cartel o senda peatonal",
+        "picadas o exceso de velocidad recurrente",
+        "motos con escape libre",
+        "vehiculos mal estacionados que obstruyen"
+      ],
+      "no_incluye": [
+        "pozo o bache en la calzada -> Calles y baches",
+        "un accidente puntual ya ocurrido, sin pedido -> No corresponde",
+        "falta de lomo de burro -> Calles y baches"
+      ],
+      "terminos": ["semaforo", "señalizacion", "picadas", "velocidad", "escape libre", "estacionado"]
     },
 
     "Seguridad": {
-        "subcategorias": [
-            "Robos",
-            "Vandalismo",
-            "Iluminación insegura"
-        ],
-        "area": "Seguridad Ciudadana"
+      "definicion": "Pedidos de seguridad dirigidos al municipio. Solo cuando hay algo que el municipio pueda hacer.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Seguridad Ciudadana / Preventores",
+      "subcategorias": [
+        "pedido_de_camaras",
+        "camara_no_funciona",
+        "pedido_de_mas_luminarias_por_inseguridad",
+        "pedido_de_patrullaje_municipal",
+        "alarma_comunitaria",
+        "zona_liberada_o_sin_control"
+      ],
+      "incluye": [
+        "pedido de camaras de seguridad o de que reparen las existentes",
+        "pedido de mas iluminacion por robos en la zona",
+        "pedido de patrullaje preventivo o de preventores",
+        "pedido de alarmas comunitarias",
+        "reclamo por falta de respuesta municipal ante inseguridad reiterada"
+      ],
+      "no_incluye": [
+        "relato de un robo puntual, sin pedido al municipio -> Otra jurisdicción",
+        "denuncia policial o pedido de mas policia -> Otra jurisdicción",
+        "aviso de que anda alguien sospechoso -> No corresponde",
+        "pelea entre vecinos -> Conflicto vecinal"
+      ],
+      "terminos": ["camaras", "camaras de seguridad", "alarma comunitaria", "preventores", "patrullaje", "inseguridad"]
+    },
+
+    "Espacios públicos": {
+      "definicion": "Plazas, parques, polideportivos y equipamiento urbano.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Espacios Públicos",
+      "subcategorias": [
+        "plaza_sin_mantenimiento",
+        "juegos_rotos",
+        "banco_o_cartel_roto",
+        "polideportivo_cerrado_o_deteriorado",
+        "vandalismo_en_espacio_publico",
+        "plaza_tomada_o_insegura"
+      ],
+      "incluye": [
+        "plaza abandonada o sin mantenimiento",
+        "juegos infantiles rotos o peligrosos",
+        "bancos, bebederos o carteles destruidos",
+        "polideportivo o playon deteriorado"
+      ],
+      "no_incluye": [
+        "plaza a oscuras -> Alumbrado público",
+        "basura en la plaza -> Higiene urbana",
+        "pasto alto en la plaza -> Arbolado y poda"
+      ],
+      "terminos": ["plaza", "plazas", "parque", "juegos", "polideportivo", "espacio verde"]
+    },
+
+    "Animales": {
+      "definicion": "Animales sueltos, abandonados o en situacion de riesgo en el espacio publico.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Zoonosis",
+      "subcategorias": [
+        "perros_sueltos",
+        "jauria",
+        "animal_abandonado",
+        "maltrato_animal",
+        "plaga_o_roedores",
+        "pedido_de_castracion"
+      ],
+      "incluye": [
+        "perros sueltos o jaurias que atacan",
+        "animales abandonados en la via publica",
+        "roedores o plagas por basura acumulada",
+        "pedido de castracion o de operativo de zoonosis"
+      ],
+      "no_incluye": [
+        "animal muerto en la calle -> Higiene urbana",
+        "perro del vecino que ladra -> Conflicto vecinal",
+        "mascota perdida -> No corresponde"
+      ],
+      "terminos": ["perros sueltos", "jauria", "zoonosis", "castracion", "roedores", "ratas"]
+    },
+
+    "Ruidos molestos": {
+      "definicion": "Ruido persistente que afecta la convivencia y requiere control municipal.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Inspección General",
+      "subcategorias": [
+        "boliche_o_local_ruidoso",
+        "fiestas_reiteradas",
+        "ruido_de_obra_fuera_de_horario",
+        "escapes_libres_reiterados"
+      ],
+      "incluye": [
+        "local comercial o boliche con ruido reiterado",
+        "fiestas que se repiten y ya fueron denunciadas",
+        "obra que trabaja fuera de horario permitido"
+      ],
+      "no_incluye": [
+        "una fiesta puntual de un vecino -> Conflicto vecinal",
+        "motos con escape libre circulando -> Tránsito y señalización",
+        "ruido de un temblor, tormenta o explosion -> No corresponde"
+      ],
+      "terminos": ["ruidos molestos", "musica fuerte", "boliche", "fiesta", "no dejan dormir"]
+    },
+
+    "Obras públicas": {
+      "definicion": "Obras municipales demoradas, inconclusas o mal ejecutadas.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Secretaría de Obras y Servicios Públicos",
+      "subcategorias": [
+        "obra_inconclusa",
+        "obra_demorada",
+        "obra_mal_ejecutada",
+        "obra_prometida_no_iniciada",
+        "obra_que_obstruye"
+      ],
+      "incluye": [
+        "obra empezada y abandonada",
+        "obra que lleva meses sin avanzar",
+        "obra terminada que quedo mal",
+        "obra anunciada que nunca empezo"
+      ],
+      "no_incluye": [
+        "bache o pozo comun -> Calles y baches",
+        "escombros de obra en la vereda -> Higiene urbana",
+        "critica generica a la gestion sin obra concreta -> No corresponde"
+      ],
+      "terminos": ["obra", "obras", "obra inconclusa", "obra parada", "nunca terminaron"]
+    },
+
+    "Transporte": {
+      "definicion": "Transporte publico de pasajeros.",
+      "jurisdiccion": "provincial",
+      "area_sugerida": "Secretaría de Transporte (Provincia)",
+      "subcategorias": [
+        "frecuencia_insuficiente",
+        "unidad_en_mal_estado",
+        "recorrido_suprimido",
+        "parada_sin_refugio",
+        "micro_que_no_pasa"
+      ],
+      "incluye": [
+        "el micro no pasa o tarda demasiado",
+        "unidades en mal estado",
+        "recorrido eliminado o cambiado sin aviso",
+        "parada sin garita ni cartel"
+      ],
+      "no_incluye": [
+        "estado de la calle por donde pasa el micro -> Calles y baches",
+        "parada a oscuras -> Alumbrado público"
+      ],
+      "terminos": ["micro", "colectivo", "parada", "frecuencia", "recorrido", "no pasa el micro"]
+    },
+
+    "Conflicto vecinal": {
+      "definicion": "Problema entre particulares donde el municipio puede intervenir por ordenanza.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Dirección de Inspección General",
+      "subcategorias": [
+        "terreno_privado_sucio",
+        "construccion_irregular",
+        "vecino_que_tira_basura",
+        "obstruccion_de_vereda",
+        "quema_de_residuos"
+      ],
+      "incluye": [
+        "terreno privado con basura o pasto alto que afecta a la cuadra",
+        "construccion sin permiso o que invade la vereda",
+        "quema de residuos que afecta a los vecinos"
+      ],
+      "no_incluye": [
+        "discusion o pelea personal -> No corresponde",
+        "ruido de un local comercial -> Ruidos molestos",
+        "basura en la via publica -> Higiene urbana"
+      ],
+      "terminos": ["el vecino", "terreno baldio", "construccion", "quema", "tapando la vereda"]
+    },
+
+    "Otra jurisdicción": {
+      "definicion": "Es un reclamo real, pero no lo resuelve el municipio. Se registra igual, para poder derivarlo y para saber cuanto pesa.",
+      "jurisdiccion": "externa",
+      "area_sugerida": "Derivar al organismo correspondiente",
+      "subcategorias": [
+        "edemsa_corte_de_luz",
+        "aysam_agua",
+        "policia_delito",
+        "salud_provincial",
+        "educacion_provincial",
+        "ruta_provincial_o_nacional",
+        "gas_o_telefonia"
+      ],
+      "incluye": [
+        "corte de luz en las viviendas (EDEMSA)",
+        "robo, asalto o entradera ya ocurridos (Policia)",
+        "problemas en hospitales, centros de salud o escuelas",
+        "estado de una ruta provincial o nacional"
+      ],
+      "no_incluye": [
+        "alumbrado publico apagado -> Alumbrado público",
+        "pedido de camaras o mas luz por inseguridad -> Seguridad"
+      ],
+      "terminos": ["edemsa", "aysam", "comisaria", "hospital", "escuela", "ruta"]
+    },
+
+    "Otro": {
+      "definicion": "Es un reclamo municipal claro pero no encaja en ninguna categoria anterior.",
+      "jurisdiccion": "municipal",
+      "area_sugerida": "Mesa de Entradas",
+      "subcategorias": ["sin_clasificar"],
+      "incluye": [
+        "reclamo municipal legitimo que no entra en las categorias definidas"
+      ],
+      "no_incluye": [
+        "cualquier cosa que no sea un reclamo -> No corresponde"
+      ],
+      "terminos": []
+    },
+
+    "No corresponde": {
+      "definicion": "No es un reclamo. Es la categoria por defecto cuando no hay nada que ningun organismo pueda resolver.",
+      "jurisdiccion": "ninguna",
+      "area_sugerida": "No corresponde",
+      "subcategorias": ["no_corresponde"],
+      "incluye": [
+        "compra, venta, alquiler o publicidad",
+        "busqueda u oferta laboral",
+        "saludo, felicitacion, chiste o mensaje social",
+        "pedido de recomendacion",
+        "difusion de un evento",
+        "consulta general",
+        "noticia compartida sin reclamo propio",
+        "convocatoria vecinal a resolver algo por cuenta propia",
+        "fenomeno natural que nadie puede reparar (temblor, tormenta, calor)",
+        "insulto o critica politica sin ningun problema concreto",
+        "mascota perdida",
+        "adhesion vacia a otro comentario"
+      ],
+      "no_incluye": [
+        "cualquier texto con un problema concreto y un responsable -> la categoria que corresponda"
+      ],
+      "terminos": []
     }
+  },
+
+  "campo_interpela_gestion": {
+    "descripcion": "Marca los reclamos que interpelan directamente al intendente o a la gestion municipal. Sirve para seguimiento.",
+    "regla": "Solo se marca verdadero cuando es_reclamo es verdadero. Un insulto sin reclamo concreto NO se marca: es No corresponde.",
+    "ejemplos_verdadero": [
+      "En Luzuriaga hace tres semanas que no pasa el recolector, Stevanato no hace nada",
+      "Cuantas veces hay que pedir que arreglen la calle? El municipio no responde",
+      "Prometieron asfaltar en Rodeo del Medio y nunca vinieron"
+    ],
+    "ejemplos_falso": [
+      "Stevanato es un desastre (sin reclamo concreto)",
+      "Manga de chorros (sin reclamo concreto)",
+      "Se cayo un arbol en la esquina de San Martin (reclamo sin mencion a la gestion)"
+    ],
+    "terminos": [
+      "stevanato", "intendente", "municipio no responde", "no cumplen",
+      "promesas incumplidas", "abandono municipal", "municipalidad",
+      "gestion", "concejo deliberante"
+    ]
+  },
+
+  "confusiones_frecuentes": [
+    {
+      "par": ["Acequias", "Riego"],
+      "criterio": "Si el problema es que la acequia esta tapada, sucia o rota -> Acequias. Si el problema es el agua misma (derroche, turno, falta) -> Riego."
+    },
+    {
+      "par": ["Acequias", "Agua y cloacas"],
+      "criterio": "Acequia es cauce de riego a cielo abierto. Si hay agua potable o cloacal involucrada -> Agua y cloacas."
+    },
+    {
+      "par": ["Seguridad", "Otra jurisdicción"],
+      "criterio": "Si pide algo al municipio (camaras, luz, preventores) -> Seguridad. Si relata un delito o pide policia -> Otra jurisdicción."
+    },
+    {
+      "par": ["Higiene urbana", "Conflicto vecinal"],
+      "criterio": "Si la basura esta en la via publica -> Higiene urbana. Si esta dentro de una propiedad privada -> Conflicto vecinal."
+    },
+    {
+      "par": ["Alumbrado público", "Otra jurisdicción"],
+      "criterio": "Luz de la calle -> Alumbrado público (municipal). Luz de las casas -> Otra jurisdicción (EDEMSA)."
+    },
+    {
+      "par": ["Calles y baches", "Obras públicas"],
+      "criterio": "Deterioro por uso -> Calles y baches. Intervencion municipal empezada, prometida o mal hecha -> Obras públicas."
+    },
+    {
+      "par": ["Ruidos molestos", "Conflicto vecinal"],
+      "criterio": "Local comercial o ruido reiterado que requiere inspeccion -> Ruidos molestos. Episodio puntual entre vecinos -> Conflicto vecinal."
+    },
+    {
+      "par": ["Arbolado y poda", "Higiene urbana"],
+      "criterio": "Arbol o rama todavia en el arbol -> Arbolado y poda. Ramas ya cortadas tiradas en la vereda -> Higiene urbana."
+    }
+  ]
 }
