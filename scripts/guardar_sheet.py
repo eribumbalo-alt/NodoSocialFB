@@ -20,6 +20,10 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
+# IMPORTANTE: "tipo" va al FINAL de la lista a proposito.
+# La funcion obtener_links_existentes lee la columna 4 (link).
+# Si se agregara una columna al principio, esa lectura se romperia.
+
 COLUMNAS = [
     "fecha_captura",
     "grupo",
@@ -33,6 +37,7 @@ COLUMNAS = [
     "motivo",
     "area_sugerida",
     "ubicacion",
+    "tipo",
 ]
 
 COLUMNAS_DATASET = [
@@ -46,7 +51,25 @@ COLUMNAS_DATASET = [
     "decision_sistema",
     "validacion_humana",
     "observaciones",
+    "tipo",
 ]
+
+# Columna donde esta el link, para deduplicar.
+COLUMNA_LINK = 4
+
+
+def letra_columna(cantidad: int) -> str:
+    """Convierte 13 en 'M', 11 en 'K', etc."""
+
+    letra = ""
+
+    while cantidad > 0:
+        cantidad, resto = divmod(cantidad - 1, 26)
+        letra = chr(65 + resto) + letra
+
+    return letra
+
+
 def conectar_google_sheet(nombre_hoja=NOMBRE_HOJA):
     """Conecta el proyecto con Google Sheets."""
 
@@ -66,23 +89,26 @@ def conectar_google_sheet(nombre_hoja=NOMBRE_HOJA):
 
     return spreadsheet.worksheet(nombre_hoja)
 
-def preparar_hoja(hoja) -> None:
-    """Crea o corrige los encabezados."""
+
+def preparar_encabezados(hoja, columnas: list[str]) -> None:
+    """Crea o corrige la fila de encabezados."""
 
     primera_fila = hoja.row_values(1)
 
-    if primera_fila != COLUMNAS:
+    if primera_fila != columnas:
+
+        rango = f"A1:{letra_columna(len(columnas))}1"
+
         hoja.update(
-            range_name="A1:L1",
-            values=[COLUMNAS],
+            range_name=rango,
+            values=[columnas],
         )
 
 
 def obtener_links_existentes(hoja) -> set[str]:
     """Lee la columna link para evitar duplicados."""
 
-    # El link ahora está en la columna 4.
-    valores = hoja.col_values(4)
+    valores = hoja.col_values(COLUMNA_LINK)
 
     if valores and valores[0].strip().lower() == "link":
         valores = valores[1:]
@@ -94,21 +120,20 @@ def obtener_links_existentes(hoja) -> set[str]:
     }
 
 
-def guardar_reclamos_sheet(
-    reclamos: list[dict],
-) -> int:
-    """Guarda únicamente reclamos nuevos."""
+def guardar_reclamos_sheet(reclamos: list[dict]) -> int:
+    """Guarda unicamente reclamos nuevos."""
 
     if not reclamos:
         return 0
 
     hoja = conectar_google_sheet()
-    preparar_hoja(hoja)
+    preparar_encabezados(hoja, COLUMNAS)
 
     links_existentes = obtener_links_existentes(hoja)
     filas_nuevas: list[list] = []
 
     for reclamo in reclamos:
+
         link = str(reclamo.get("link", "")).strip()
 
         if not link or link in links_existentes:
@@ -128,6 +153,7 @@ def guardar_reclamos_sheet(
                 reclamo.get("motivo", ""),
                 reclamo.get("area_sugerida", ""),
                 reclamo.get("ubicacion", ""),
+                reclamo.get("tipo", "publicacion"),
             ]
         )
 
@@ -141,42 +167,57 @@ def guardar_reclamos_sheet(
 
     return len(filas_nuevas)
 
+
 def guardar_dataset_ia(publicaciones: list[dict]) -> int:
-    """Guarda todas las publicaciones analizadas."""
+    """Guarda todas las publicaciones y comentarios analizados.
+
+    Deduplica por link igual que la hoja de reclamos: sin esto,
+    cada corrida repetia las mismas filas y sobreponderaba
+    publicaciones repetidas en el dataset de entrenamiento.
+    """
 
     if not publicaciones:
         return 0
 
     hoja = conectar_google_sheet("Dataset IA")
+    preparar_encabezados(hoja, COLUMNAS_DATASET)
 
-    primera_fila = hoja.row_values(1)
-
-    if primera_fila != COLUMNAS_DATASET:
-        hoja.update(
-            range_name="A1:J1",
-            values=[COLUMNAS_DATASET],
-        )
-
-    filas = []
+    links_existentes = obtener_links_existentes(hoja)
+    filas: list[list] = []
 
     for publicacion in publicaciones:
 
-        filas.append([
-            publicacion.get("fecha_captura", ""),
-            publicacion.get("grupo", ""),
-            publicacion.get("texto", ""),
-            publicacion.get("link", ""),
-            publicacion.get("respuesta_ia", ""),
-            publicacion.get("categoria", ""),
-            publicacion.get("confianza", ""),
-            "Guardar" if publicacion.get("es_reclamo") else "Descartar",
-            "",
-            "",
-        ])
+        link = str(publicacion.get("link", "")).strip()
 
-    hoja.append_rows(
-        filas,
-        value_input_option="USER_ENTERED",
-    )
+        if not link or link in links_existentes:
+            continue
+
+        filas.append(
+            [
+                publicacion.get("fecha_captura", ""),
+                publicacion.get("grupo", ""),
+                publicacion.get("texto", ""),
+                link,
+                publicacion.get("respuesta_ia", ""),
+                publicacion.get("categoria", ""),
+                publicacion.get("confianza", ""),
+                (
+                    "Guardar"
+                    if publicacion.get("es_reclamo")
+                    else "Descartar"
+                ),
+                "",
+                "",
+                publicacion.get("tipo", "publicacion"),
+            ]
+        )
+
+        links_existentes.add(link)
+
+    if filas:
+        hoja.append_rows(
+            filas,
+            value_input_option="USER_ENTERED",
+        )
 
     return len(filas)

@@ -22,12 +22,14 @@ ARCHIVO_CATEGORIAS = KNOWLEDGE_DIR / "categorias.json"
 
 MODELO = "llama3.2:3b"
 
-# Cuantos ejemplos de la memoria se meten en el prompt.
-# Con llama3.2:3b no conviene pasar de 10: mas ejemplos empeoran el
-# resultado en vez de mejorarlo.
+# Con llama3.2:3b no conviene pasar de 10 ejemplos:
+# mas ejemplos empeoran el resultado en vez de mejorarlo.
 CANTIDAD_EJEMPLOS = 8
 
-# Claves que cada ejemplo de la memoria tiene que tener para ser usable.
+# Cuanto texto de la publicacion padre se usa como contexto
+# al clasificar un comentario.
+LIMITE_CONTEXTO = 700
+
 CLAVES_REQUERIDAS = ("texto", "es_reclamo", "categoria")
 
 cliente = Client(host="http://localhost:11434")
@@ -37,7 +39,7 @@ cliente = Client(host="http://localhost:11434")
 # REGLAS DE DECISION
 # ==========================
 # Este bloque se manda tal cual al modelo.
-# Es el lugar donde vas a agregar aprendizajes cuando detectes
+# Es el lugar donde agregar aprendizajes cuando detectes
 # errores repetidos. Editalo aca, no en medio del codigo.
 
 REGLAS = """
@@ -47,10 +49,10 @@ REGLAS DE DECISION
 
 No inventes informacion.
 
-No inventes ubicaciones. Si la publicacion no menciona una calle, un
-barrio o un lugar concreto, dejá el campo ubicacion vacio.
+No inventes ubicaciones. Si el texto no menciona una calle, un barrio
+o un lugar concreto, dejá el campo ubicacion vacio.
 
-NO es un reclamo (es_reclamo = false) cuando la publicacion es:
+NO es un reclamo (es_reclamo = false) cuando el texto es:
 - compra, venta o publicidad
 - busqueda u oferta laboral
 - alquiler o venta de inmuebles
@@ -60,6 +62,8 @@ NO es un reclamo (es_reclamo = false) cuando la publicacion es:
 - consulta general
 - una noticia compartida sobre un problema, sin reclamo propio
 - una convocatoria vecinal para resolver algo por cuenta propia
+- un fenomeno natural que el municipio no puede reparar
+  (un temblor, una tormenta, el calor)
 
 En todos esos casos la respuesta debe ser:
 es_reclamo = false
@@ -78,6 +82,43 @@ SI es un reclamo (es_reclamo = true) cuando hay:
 Un reclamo puede estar formulado como pregunta
 ("¿alguien va a arreglar esto alguna vez?") o como simple descripcion
 del problema, sin pedido explicito.
+
+La pregunta clave es siempre la misma:
+¿hay algo concreto que el municipio pueda hacer al respecto?
+Si la respuesta es no, no es un reclamo.
+"""
+
+
+REGLAS_COMENTARIO = """
+==========================
+ATENCION: ESTAS CLASIFICANDO UN COMENTARIO
+==========================
+
+El texto a clasificar es un COMENTARIO dentro de una publicacion.
+Mas abajo vas a ver la publicacion original, que sirve solo como
+contexto para entender de que se esta hablando.
+
+Clasifica UNICAMENTE el comentario.
+NO clasifiques la publicacion original.
+
+NO es reclamo un comentario que solamente:
+- adhiere sin aportar nada nuevo ("a mi tambien", "+1", "tal cual",
+  "totalmente de acuerdo", "lo mismo digo")
+- agradece, saluda o hace un chiste
+- opina sobre politica, sobre el gobierno o sobre otra persona
+- responde una pregunta de otro vecino
+- etiqueta o menciona a alguien
+
+SI es reclamo un comentario que aporta un problema propio con algun
+dato nuevo: una ubicacion, una fecha, una duracion o un detalle
+concreto.
+
+Ejemplo que SI es reclamo:
+"a mi me pasa lo mismo en San Martin al 300, hace tres semanas que
+estamos sin luz"
+
+Ejemplo que NO es reclamo:
+"a mi tambien me pasa, es un desastre"
 """
 
 
@@ -132,7 +173,6 @@ class ClasificacionReclamo(BaseModel):
 # ==========================
 
 def cargar_prompt() -> str:
-    """Lee el prompt base desde prompts/clasificar_reclamo.txt"""
 
     if not ARCHIVO_PROMPT.exists():
         raise FileNotFoundError(
@@ -143,7 +183,6 @@ def cargar_prompt() -> str:
 
 
 def cargar_memoria() -> list[dict]:
-    """Lee la lista de ejemplos de memoria_clasificador.json"""
 
     if not ARCHIVO_MEMORIA.exists():
         print(
@@ -159,7 +198,6 @@ def cargar_memoria() -> list[dict]:
 
 
 def cargar_categorias() -> dict:
-    """Lee la taxonomia desde categorias.json"""
 
     if not ARCHIVO_CATEGORIAS.exists():
         raise FileNotFoundError(
@@ -176,11 +214,7 @@ def cargar_categorias() -> dict:
 # ==========================
 
 def ejemplos_utilizables(ejemplos: list) -> list[dict]:
-    """Se queda solo con los ejemplos que tienen las claves esperadas.
-
-    Si el archivo de memoria tiene otro formato, avisa por pantalla
-    en vez de romper el programa.
-    """
+    """Se queda solo con los ejemplos que tienen las claves esperadas."""
 
     validos = []
     descartados = 0
@@ -199,27 +233,20 @@ def ejemplos_utilizables(ejemplos: list) -> list[dict]:
     if descartados:
         print(
             f"[AVISO] Se ignoraron {descartados} ejemplos de la memoria "
-            f"porque no tienen las claves {CLAVES_REQUERIDAS}. "
-            "Revisá el formato que genera entrenador.py."
+            f"porque no tienen las claves {CLAVES_REQUERIDAS}."
         )
 
     return validos
 
 
 def construir_contexto() -> str:
-    """Arma el bloque de ejemplos que se le muestra al modelo.
-
-    Devuelve texto vacio si no hay ejemplos utilizables.
-    """
+    """Arma el bloque de ejemplos aprendidos."""
 
     ejemplos = ejemplos_utilizables(cargar_memoria())
 
     if not ejemplos:
         return ""
 
-    # Por ahora se toman los ultimos N.
-    # Mas adelante conviene elegirlos de forma estratificada:
-    # unos pocos por categoria, y priorizando los errores corregidos.
     seleccion = ejemplos[-CANTIDAD_EJEMPLOS:]
 
     bloques = []
@@ -240,7 +267,6 @@ def construir_contexto() -> str:
 
 
 def construir_categorias() -> str:
-    """Arma el listado de categorias y subcategorias permitidas."""
 
     categorias = cargar_categorias()
 
@@ -260,16 +286,23 @@ def construir_categorias() -> str:
     return texto
 
 
-def construir_prompts(texto: str) -> tuple[str, str]:
+def construir_prompts(
+    texto: str,
+    contexto_padre: str = "",
+    tipo: str = "publicacion",
+) -> tuple[str, str]:
     """Devuelve (prompt_sistema, prompt_usuario).
 
-    Se separa del clasificador para poder inspeccionar el prompt
-    sin llamar a Ollama. Ver la funcion ver_prompt().
+    tipo:
+        "publicacion" -> se clasifica el texto tal cual
+        "comentario"  -> se agrega la publicacion padre como contexto
     """
 
     prompt_base = cargar_prompt()
     categorias = construir_categorias()
-    contexto = construir_contexto()
+    ejemplos = construir_contexto()
+
+    es_comentario = tipo == "comentario"
 
     prompt_sistema = (
         f"{prompt_base}\n\n"
@@ -277,24 +310,42 @@ def construir_prompts(texto: str) -> tuple[str, str]:
         f"{REGLAS}"
     )
 
-    # El bloque de ejemplos solo aparece si realmente hay ejemplos.
+    if es_comentario:
+        prompt_sistema += f"\n{REGLAS_COMENTARIO}"
+
+    # Los ejemplos solo aparecen si realmente existen.
     # Poner el titulo sin contenido confunde al modelo.
-    if contexto:
+    if ejemplos:
         bloque_ejemplos = (
             "==========================\n"
             "EJEMPLOS VALIDADOS POR UN OPERADOR HUMANO\n"
             "==========================\n\n"
             "Estos casos ya fueron corregidos por una persona.\n"
             "Usalos como referencia para decidir.\n\n"
-            f"{contexto}\n\n"
+            f"{ejemplos}\n\n"
         )
     else:
         bloque_ejemplos = ""
 
+    # Contexto del post padre, solo para comentarios.
+    if es_comentario and contexto_padre.strip():
+        bloque_contexto = (
+            "==========================\n"
+            "PUBLICACION ORIGINAL (SOLO CONTEXTO - NO CLASIFICAR)\n"
+            "==========================\n\n"
+            f"{contexto_padre.strip()[:LIMITE_CONTEXTO]}\n\n"
+        )
+        titulo_objetivo = "COMENTARIO A CLASIFICAR"
+
+    else:
+        bloque_contexto = ""
+        titulo_objetivo = "PUBLICACION A CLASIFICAR"
+
     prompt_usuario = (
         f"{bloque_ejemplos}"
+        f"{bloque_contexto}"
         "==========================\n"
-        "PUBLICACION A CLASIFICAR\n"
+        f"{titulo_objetivo}\n"
         "==========================\n\n"
         f"{texto}\n\n"
         "Respondé unicamente con el JSON solicitado."
@@ -307,32 +358,43 @@ def construir_prompts(texto: str) -> tuple[str, str]:
 # CLASIFICADOR
 # ==========================
 
-def clasificar_publicacion(texto: str) -> dict:
-    """Clasifica una publicacion y devuelve un diccionario."""
+def clasificar_publicacion(
+    texto: str,
+    contexto_padre: str = "",
+    tipo: str = "publicacion",
+) -> dict:
+    """Clasifica un texto y devuelve un diccionario.
+
+    Uso normal:
+        clasificar_publicacion(texto_del_post)
+
+    Para un comentario:
+        clasificar_publicacion(
+            texto_del_comentario,
+            contexto_padre=texto_del_post,
+            tipo="comentario",
+        )
+    """
 
     texto = texto.strip()
 
     if not texto:
         raise ValueError("Texto vacio.")
 
-    prompt_sistema, prompt_usuario = construir_prompts(texto)
+    prompt_sistema, prompt_usuario = construir_prompts(
+        texto,
+        contexto_padre,
+        tipo,
+    )
 
     respuesta = cliente.chat(
         model=MODELO,
         messages=[
-            {
-                "role": "system",
-                "content": prompt_sistema,
-            },
-            {
-                "role": "user",
-                "content": prompt_usuario,
-            },
+            {"role": "system", "content": prompt_sistema},
+            {"role": "user", "content": prompt_usuario},
         ],
         format=ClasificacionReclamo.model_json_schema(),
-        options={
-            "temperature": 0,
-        },
+        options={"temperature": 0},
     )
 
     contenido = respuesta.message.content.strip()
@@ -364,7 +426,6 @@ def clasificar_publicacion(texto: str) -> dict:
 # ==========================
 
 def diagnostico() -> None:
-    """Muestra el estado de la memoria antes de clasificar."""
 
     print("=" * 60)
     print("DIAGNOSTICO DE CARGA")
@@ -386,20 +447,27 @@ def diagnostico() -> None:
 
     elif ejemplos:
         print("\nEl archivo tiene ejemplos pero con otro formato.")
-        print("Primer ejemplo encontrado:")
         print(json.dumps(ejemplos[0], ensure_ascii=False, indent=2))
 
     print()
 
 
-def ver_prompt(texto: str) -> None:
+def ver_prompt(
+    texto: str,
+    contexto_padre: str = "",
+    tipo: str = "publicacion",
+) -> None:
     """Imprime el prompt exacto que se le manda al modelo.
 
-    Sirve para revisar que los ejemplos y las categorias esten
-    realmente entrando. No llama a Ollama.
+    No llama a Ollama. Sirve para revisar que los ejemplos,
+    las categorias y el contexto esten entrando bien.
     """
 
-    prompt_sistema, prompt_usuario = construir_prompts(texto)
+    prompt_sistema, prompt_usuario = construir_prompts(
+        texto,
+        contexto_padre,
+        tipo,
+    )
 
     print("=" * 60)
     print("PROMPT DE SISTEMA")
@@ -414,35 +482,58 @@ def ver_prompt(texto: str) -> None:
 
 def mostrar(resultado: dict) -> None:
 
-    print(
-        json.dumps(
-            resultado,
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
+    print(json.dumps(resultado, ensure_ascii=False, indent=2))
 
 
 # ==========================
 # PRUEBA
 # ==========================
 
+POST_ALUMBRADO = (
+    "Hace cuatro dias estamos sin alumbrado publico en calle "
+    "Sarmiento. Ya llamamos varias veces y nadie vino."
+)
+
 PRUEBAS = [
-    (
-        "Deberia ser RECLAMO",
-        "Hace cuatro dias estamos sin alumbrado publico en calle "
-        "Sarmiento. Ya llamamos varias veces y nadie vino.",
-    ),
-    (
-        "NO deberia ser reclamo",
-        "Vendo heladera con freezer, funciona perfecto. "
-        "Interesados por privado.",
-    ),
-    (
-        "NO deberia ser reclamo (caso dificil)",
-        "Chicos, este sabado a las 9 nos juntamos a limpiar el baldio "
-        "de la esquina. Traigan bolsas y guantes.",
-    ),
+    {
+        "etiqueta": "PUBLICACION - deberia ser RECLAMO",
+        "texto": POST_ALUMBRADO,
+        "contexto": "",
+        "tipo": "publicacion",
+    },
+    {
+        "etiqueta": "PUBLICACION - NO deberia ser reclamo",
+        "texto": (
+            "Vendo heladera con freezer, funciona perfecto. "
+            "Interesados por privado."
+        ),
+        "contexto": "",
+        "tipo": "publicacion",
+    },
+    {
+        "etiqueta": "PUBLICACION - NO deberia ser reclamo (dificil)",
+        "texto": (
+            "Chicos, este sabado a las 9 nos juntamos a limpiar el "
+            "baldio de la esquina. Traigan bolsas y guantes."
+        ),
+        "contexto": "",
+        "tipo": "publicacion",
+    },
+    {
+        "etiqueta": "COMENTARIO - NO deberia ser reclamo (adhesion vacia)",
+        "texto": "A mi tambien me pasa, es un desastre",
+        "contexto": POST_ALUMBRADO,
+        "tipo": "comentario",
+    },
+    {
+        "etiqueta": "COMENTARIO - SI deberia ser reclamo (aporta datos)",
+        "texto": (
+            "Igual aca en San Martin al 300, hace tres semanas que "
+            "estamos sin luz en toda la cuadra"
+        ),
+        "contexto": POST_ALUMBRADO,
+        "tipo": "comentario",
+    },
 ]
 
 
@@ -450,16 +541,22 @@ if __name__ == "__main__":
 
     diagnostico()
 
-    for etiqueta, publicacion in PRUEBAS:
+    for prueba in PRUEBAS:
 
         print("=" * 60)
-        print(etiqueta)
+        print(prueba["etiqueta"])
         print("=" * 60)
-        print(publicacion)
+        print(prueba["texto"])
         print("-" * 60)
 
         try:
-            mostrar(clasificar_publicacion(publicacion))
+            mostrar(
+                clasificar_publicacion(
+                    prueba["texto"],
+                    contexto_padre=prueba["contexto"],
+                    tipo=prueba["tipo"],
+                )
+            )
         except Exception as error:
             print(f"ERROR: {error}")
 
