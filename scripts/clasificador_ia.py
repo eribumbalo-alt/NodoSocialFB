@@ -122,6 +122,39 @@ Ejemplo que NO es reclamo:
 """
 
 
+REGLAS_COMENTARIO = """
+==========================
+ATENCION: ESTAS CLASIFICANDO UN COMENTARIO
+==========================
+
+El texto a clasificar es un COMENTARIO dentro de una publicacion.
+Mas abajo vas a ver la publicacion original, que sirve solo como
+contexto para entender de que se esta hablando.
+
+Clasifica UNICAMENTE el comentario.
+NO clasifiques la publicacion original.
+
+NO es reclamo un comentario que solamente:
+- adhiere sin aportar nada nuevo ("a mi tambien", "+1", "tal cual",
+  "totalmente de acuerdo", "lo mismo digo")
+- agradece, saluda o hace un chiste
+- opina sobre politica, sobre el gobierno o sobre otra persona
+- responde una pregunta de otro vecino
+- etiqueta o menciona a alguien
+
+SI es reclamo un comentario que aporta un problema propio con algun
+dato nuevo: una ubicacion, una fecha, una duracion o un detalle
+concreto.
+
+Ejemplo que SI es reclamo:
+"a mi me pasa lo mismo en San Martin al 300, hace tres semanas que
+estamos sin luz"
+
+Ejemplo que NO es reclamo:
+"a mi tambien me pasa, es un desastre"
+"""
+
+
 # ==========================
 # MODELO DE RESPUESTA
 # ==========================
